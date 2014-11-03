@@ -18,11 +18,12 @@ typedef struct Node Node;
 Node * NIL;
 void init(TREE * tree);
 void insert(TREE * tree, int value);
-void BlanceIt(TREE * tree, Node * z);
 void printTree(TREE * tree);
 void printNodes(Node * rnode);
 void rotateR(TREE * t, Node * z);
 void rotateL(TREE * t, Node * z);
+void InsertBalance(TREE * tree, Node * z);
+void DeleteBalance(TREE * tree, Node * z);
 int main(){
     TREE tree;
     init(&tree);
@@ -81,7 +82,7 @@ void insert(TREE * tree,int value){
         y->r = z;
     }
     z->p = y;
-    InsertBlance(tree, z);
+    InsertBalance(tree, z);
 }
 void rotateR(TREE * t, Node * z){
     z->l->p = z->p;
@@ -107,7 +108,7 @@ void rotateL(TREE * t, Node * z){
     }
     z->r->l = z;
 }
-void InsertBlance(TREE * tree, Node * z){
+void InsertBalance(TREE * tree, Node * z){
     while(z->p->color == RED){
 //        printf("v:%d,clr:%d\n", z->p->v, z->p->color);
         if(z->p->p->l == z->p){
@@ -146,7 +147,65 @@ void InsertBlance(TREE * tree, Node * z){
     tree->root->color = BLK;
 //    printf("%d, %d\n", tree->root->v, tree->root->color);
 }
-//--------------------printf whole tree for test
+void replant(TREE * tree, Node * origin, Node * res){
+    if(origin->p == NIL){
+        tree->root = res;
+        return;
+    }
+    res->p = origin->p;
+    if(origin->p->l == origin){
+        origin->p->l = res;
+    }
+    else{
+        origin->p->r = res;
+    }
+    return;
+}
+Node * minNode(TREE * tree){
+    Node * n = tree->root;
+    Node * prev;
+    while(n != NIL){
+        prev = n;
+        n = n->l;
+    }
+    return prev;
+}
+int delete(TREE * tree, int value){
+    ; // find z in tree
+    _delete(tree, z);
+    return 0;
+}
+void _delete(TREE * tree, Node * z){
+    Node * illNode = z;
+    Node * tofixNode;
+    if(z->l == NIL){
+        tofixNode = z->r;
+        replant(tree, z, z->r);
+    }
+    else if(z->r == NIL){
+        tofixNode = z->l;
+        replant(tree, z, z->l);
+    }
+    else{
+        illNode = minNode(z->r);
+        tofixNode = illNode->r;
+        replant(tree, illNode, illNode->r);
+        illNode->l = z->l;
+        illNode->r = z->r;
+        z->l->p = illNode;
+        z->r->p = illNode;
+        illNode->color = z->color;
+        replant(tree, z, illNode);
+    }
+    if(illNode->color == BLK){
+        DeleteBalance(tree, tofixNode);
+    }
+    free(z);
+}
+void DeleteBalance(TREE * tree, Node * z){
+    ;
+}
+//--------------------printf the whole tree for test
 void printTree(TREE * tree){
     Node * x = tree->root;
     if(x == NIL){
